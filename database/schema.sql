@@ -63,7 +63,6 @@ CREATE TABLE project_members (
 /* SUBMISSIONS TABLE
   Stores code snippets or text files submitted for review.
  */
-
 CREATE TABLE submissions (
     id SERIAL PRIMARY KEY,
     project_id INTEGER NOT NULL,

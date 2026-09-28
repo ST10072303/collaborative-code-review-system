@@ -5,8 +5,5 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // A connection pool allows our application to reuse database connections instead of opening a completely new connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-
+const pool = new Pool({connectionString: process.env.DATABASE_URL,});
 export default pool;
