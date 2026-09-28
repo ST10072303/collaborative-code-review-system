@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import authRoutes from "./routes/authRoutes";
 
 // app will be responsible for handling HTTP requests.
 const app = express();
@@ -9,6 +10,9 @@ app.use(cors());
 
 // allow Express to read JSON data sent in request bodies.
 app.use(express.json());
+
+// authentication routes
+app.use("/api/auth", authRoutes);
 
 // test route.
 app.get("/", (req, res) => {
