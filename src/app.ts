@@ -3,6 +3,7 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes";
 import "./types/express";
 import userRoutes from "./routes/userRoutes";
+import projectRoutes from "./routes/projectRoutes";
 
 
 // app will be responsible for handling HTTP requests.
@@ -17,6 +18,7 @@ app.use(express.json());
 // authentication routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/projects", projectRoutes);
 
 // test route.
 app.get("/", (req, res) => {
