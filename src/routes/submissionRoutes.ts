@@ -1,10 +1,22 @@
 import { Router } from "express";
-import { createSubmission } from "../controllers/submissionController";
+import { createSubmission, getSubmissionById, getSubmissions, updateSubmission } from "../controllers/submissionController";
 import { authenticateToken } from "../middleware/authMiddleware";
 
 const router = Router();
 
 // POST /api/submissions
- router.post("/", authenticateToken, createSubmission);
+router.post("/", authenticateToken, createSubmission);
+
+// GET /api/submissions
+router.get("/", authenticateToken, getSubmissions);
+
+// GET /api/submissions/:id, get a single submission.
+router.get("/:id", authenticateToken, getSubmissionById);
+
+// PUT /api/submissions/:id, update a submission.
+router.put("/:id", authenticateToken, updateSubmission);
+
+// DELETE /api/submissions/:id, delete a submission.
+// router.delete("/:id", authenticateToken, deleteSubmission);
 
 export default router;
