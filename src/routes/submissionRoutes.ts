@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createSubmission, getSubmissionById, getSubmissions, updateSubmission } from "../controllers/submissionController";
+import { createSubmission, deleteSubmission, getSubmissionById, getSubmissions, updateSubmission } from "../controllers/submissionController";
 import { authenticateToken } from "../middleware/authMiddleware";
 
 const router = Router();
@@ -17,6 +17,6 @@ router.get("/:id", authenticateToken, getSubmissionById);
 router.put("/:id", authenticateToken, updateSubmission);
 
 // DELETE /api/submissions/:id, delete a submission.
-// router.delete("/:id", authenticateToken, deleteSubmission);
+ router.delete("/:id", authenticateToken, deleteSubmission);
 
 export default router;

@@ -82,7 +82,7 @@ export const getSubmissions = async (req: Request, res: Response): Promise<void>
 };
 
 // get a single submission by ID.
- export const getSubmissionById = async (req: Request, res: Response): Promise<void> => {
+export const getSubmissionById = async (req: Request, res: Response): Promise<void> => {
     try {
         // make sure the user is authenticated.
         if (!req.user) {
@@ -90,7 +90,7 @@ export const getSubmissions = async (req: Request, res: Response): Promise<void>
             return;
         }
 
-        // Get the submission ID from the URL.
+        // get the submission ID from the URL.
         const submissionId = Number(req.params.id);
 
         // validate the submission ID.
@@ -100,16 +100,16 @@ export const getSubmissions = async (req: Request, res: Response): Promise<void>
         }
 
         // find the submission and check whether the authenticated user has access to its project.
-        const result = await pool.query(`SELECT DISTINCT s.id, s.project_id, s.submitted_by, s.title, s.code, s.language,
-                s.status, s.created_at, s.updated_at
+        const result = await pool.query(`SELECT DISTINCT s.id, s.project_id, s.submitted_by, s.title, s.code, s.language, s.status, s.created_at, s.updated_at
             FROM submissions s INNER JOIN projects p ON s.project_id = p.id LEFT JOIN project_members pm ON p.id = pm.project_id
-            WHERE s.id = $1AND (p.created_by = $2 OR pm.user_id = $2)`, [submissionId, req.user.userId]);
+            WHERE s.id = $1 AND (p.created_by = $2 OR pm.user_id = $2)`, [submissionId, req.user.userId]);
 
         // submission either does not exist or the user does not have access to it.
         if (result.rows.length === 0) {
             res.status(404).json({message: "Submission not found."});
             return;
         }
+
         res.status(200).json({submission: result.rows[0]});
     } catch (error) {
         console.error("Get submission error:", error);
@@ -155,14 +155,51 @@ export const getSubmissions = async (req: Request, res: Response): Promise<void>
         }
 
         // update the submission.
-                const result = await pool.query(`UPDATE submissions SET title = COALESCE($1, title), code = COALESCE($2, code), 
-            language = COALESCE($3, language), updated_at = CURRENT_TIMESTAMP
-            WHERE id = $4 AND submitted_by = $5 RETURNING id, project_id, submitted_by, title, code, language, status, created_at, updated_at`,
-            [title, code, language, submissionId, req.user.userId]);
+            const result = await pool.query(`UPDATE submissions SET title = COALESCE($1, title), code = COALESCE($2, code), 
+               language = COALESCE($3, language), updated_at = CURRENT_TIMESTAMP
+               WHERE id = $4 AND submitted_by = $5 RETURNING id, project_id, submitted_by, title, code, language, status, created_at, updated_at`,
+               [title, code, language, submissionId, req.user.userId]);
 
         res.status(200).json({message: "Submission updated successfully.", submission: result.rows[0]});
     } catch (error) {
         console.error("Update submission error:", error);
         res.status(500).json({message: "An error occurred while updating the submission."});
+    }
+};
+
+// delete a code submission.
+ export const deleteSubmission = async (req: Request, res: Response): Promise<void> => {
+    try {
+        // make sure the user is authenticated.
+        if (!req.user) {
+            res.status(401).json({message: "Authentication required."});
+            return;
+        }
+
+        // get the submission ID from the URL.
+        const submissionId = Number(req.params.id);
+
+        // validate the submission ID.
+        if (isNaN(submissionId)) {
+            res.status(400).json({message: "Invalid submission ID."});
+            return;
+        }
+
+        // delete only if the submission belongs to the authenticated user.
+        const result = await pool.query(`DELETE FROM submissions
+            WHERE id = $1 AND submitted_by = $2  RETURNING id`,[submissionId, req.user.userId]
+        );
+
+        // no matching submission was found.
+        if (result.rows.length === 0) {
+            res.status(404).json({message: "Submission not found."});
+            return;
+        }
+        res.status(200).json({message: "Submission deleted successfully."
+        });
+    } catch (error) {
+        console.error("Delete submission error:", error);
+        res.status(500).json({message: "An error occurred while deleting the submission."
+        });
     }
 };
