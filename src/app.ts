@@ -8,6 +8,7 @@ import submissionRoutes from "./routes/submissionRoutes";
 import commentRoutes from "./routes/commentRoutes"
 import reviewRoutes from "./routes/reviewRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
+import statsRoutes from "./routes/statsRoutes";
 
 
 // app will be responsible for handling HTTP requests.
@@ -27,6 +28,7 @@ app.use("/api/submissions", submissionRoutes);
 app.use("/api", commentRoutes);
 app.use("/api", reviewRoutes);
 app.use("/api", notificationRoutes);
+app.use("/api", statsRoutes);
 
 // test route.
 app.get("/", (req, res) => {
