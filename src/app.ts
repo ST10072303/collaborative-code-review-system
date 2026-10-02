@@ -9,6 +9,7 @@ import commentRoutes from "./routes/commentRoutes"
 import reviewRoutes from "./routes/reviewRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
 import statsRoutes from "./routes/statsRoutes";
+import { errorHandler } from "./middleware/errorMiddleware";
 
 
 // app will be responsible for handling HTTP requests.
@@ -29,6 +30,9 @@ app.use("/api", commentRoutes);
 app.use("/api", reviewRoutes);
 app.use("/api", notificationRoutes);
 app.use("/api", statsRoutes);
+
+// error handler
+app.use(errorHandler);
 
 // test route.
 app.get("/", (req, res) => {
