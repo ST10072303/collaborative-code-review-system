@@ -124,3 +124,26 @@ CREATE TABLE comments (
             line_number IS NULL OR line_number > 0
         )
 );
+
+/* Stores the history of review actions performed on submissions. */
+CREATE TABLE review_history (
+    id SERIAL PRIMARY KEY,
+
+    /* The submission being reviewed. */
+    submission_id INTEGER NOT NULL
+        REFERENCES submissions(id) ON DELETE CASCADE,
+
+    /* The reviewer who performed the action.*/
+    reviewer_id INTEGER NOT NULL
+        REFERENCES users(id) ON DELETE CASCADE,
+
+    /* The review action that was performed. */
+    action VARCHAR(50) NOT NULL
+        CHECK (action IN ('approved', 'changes_requested')),
+
+    /* Optional explanation from the reviewer. */
+    comment TEXT,
+
+    /* When the review action was performed. */
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
