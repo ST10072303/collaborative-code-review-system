@@ -5,6 +5,7 @@ import "./types/express";
 import userRoutes from "./routes/userRoutes";
 import projectRoutes from "./routes/projectRoutes";
 import submissionRoutes from "./routes/submissionRoutes";
+import commentRoutes from "./routes/commentRoutes"
 
 
 // app will be responsible for handling HTTP requests.
@@ -21,6 +22,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/submissions", submissionRoutes);
+app.use("/api", commentRoutes);
 
 // test route.
 app.get("/", (req, res) => {
