@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import pool from "../config/db";
+import { sendNotification } from "../websocket";
 
 // approve a code submission, only reviewers can approve submissions.
 export const approveSubmission = async (req: Request, res: Response): Promise<void> => {
@@ -53,11 +54,17 @@ export const approveSubmission = async (req: Request, res: Response): Promise<vo
             WHERE id = $2`, [`Your submission "${updateResult.rows[0].title}" has been approved.`, submissionId]);
 
         res.status(200).json({message: "Submission approved successfully.", submission: updateResult.rows[0]});
+
+        // send the notification in real time if the submitter is currently connected to WebSocket.
+        const submittedBy = updateResult.rows[0].submitted_by;
+        sendNotification(submittedBy, `Your submission "${updateResult.rows[0].title}" has been approved.`);
+
     } catch (error) {
         console.error("Approve submission error:", error);
         res.status(500).json({message: "An error occurred while approving the submission."});
     }
 };
+
 
 // request changes to a code submission, only reviewers can request changes.
  export const requestChanges = async (req: Request, res: Response): Promise<void> => {
@@ -74,7 +81,7 @@ export const approveSubmission = async (req: Request, res: Response): Promise<vo
             return;
         }
 
-        // Convert the submission ID from the URL to a number
+        // convert the submission ID from the URL to a number
         const submissionId = Number(req.params.id);
 
         // validate the submission ID
@@ -119,6 +126,11 @@ export const approveSubmission = async (req: Request, res: Response): Promise<vo
 
         // return the updated submission
         res.status(200).json({message: "Changes requested successfully.", submission: updateResult.rows[0]});
+
+        // Send the notification in real time if the submitter
+        // is currently connected through WebSocket.
+        const submittedBy = updateResult.rows[0].submitted_by;
+        sendNotification(submittedBy, `Changes have been requested for your submission "${updateResult.rows[0].title}". Reviewer comment: ${comment.trim()}`);
 
     } catch (error) {
         console.error("Request changes error:", error);
