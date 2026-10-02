@@ -40,12 +40,17 @@ export const approveSubmission = async (req: Request, res: Response): Promise<vo
 
         // update the submission status.
         const updateResult = await pool.query(`UPDATE submissions SET status = 'approved', updated_at = CURRENT_TIMESTAMP
-            WHERE id = $1 RETURNING id, project_id, submitted_by, title, code, language, status, created_at, updated_at `,
-            [submissionId]);
+            WHERE id = $1 RETURNING id, project_id, submitted_by, title, code, language, status, created_at, updated_at `, [submissionId]);
 
         // record the approval in review history.
         await pool.query(`INSERT INTO review_history (submission_id, reviewer_id, action, comment)
-            VALUES ($1, $2, 'approved', $3)`,[submissionId, req.user.userId, comment || null]);
+            VALUES ($1, $2, 'approved', $3)`, [submissionId, req.user.userId, comment || null]);
+
+        // create a notification for the submitter.
+        await pool.query(`INSERT INTO notifications (user_id, message)
+            SELECT submitted_by, $1 
+            FROM submissions
+            WHERE id = $2`, [`Your submission "${updateResult.rows[0].title}" has been approved.`, submissionId]);
 
         res.status(200).json({message: "Submission approved successfully.", submission: updateResult.rows[0]});
     } catch (error) {
@@ -104,6 +109,13 @@ export const approveSubmission = async (req: Request, res: Response): Promise<vo
         // save the review action and comment
         await pool.query(`INSERT INTO review_history (submission_id, reviewer_id, action, comment)
             VALUES ($1, $2, 'changes_requested', $3)`,[submissionId, req.user.userId, comment.trim()]);
+
+        // create a notification for the submitter.
+        await pool.query(`INSERT INTO notifications (user_id, message)
+            SELECT submitted_by, $1
+            FROM submissions
+            WHERE id = $2`,
+            [`Changes have been requested for your submission "${updateResult.rows[0].title}". Reviewer comment: ${comment.trim()}`, submissionId]);
 
         // return the updated submission
         res.status(200).json({message: "Changes requested successfully.", submission: updateResult.rows[0]});
