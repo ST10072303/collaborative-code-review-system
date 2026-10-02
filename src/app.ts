@@ -7,6 +7,7 @@ import projectRoutes from "./routes/projectRoutes";
 import submissionRoutes from "./routes/submissionRoutes";
 import commentRoutes from "./routes/commentRoutes"
 import reviewRoutes from "./routes/reviewRoutes";
+import notificationRoutes from "./routes/notificationRoutes";
 
 
 // app will be responsible for handling HTTP requests.
@@ -25,6 +26,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/submissions", submissionRoutes);
 app.use("/api", commentRoutes);
 app.use("/api", reviewRoutes);
+app.use("/api", notificationRoutes);
 
 // test route.
 app.get("/", (req, res) => {

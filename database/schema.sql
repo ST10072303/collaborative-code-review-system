@@ -147,3 +147,17 @@ CREATE TABLE review_history (
     /* When the review action was performed. */
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+/*notifications table*/
+CREATE TABLE notifications (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL
+        REFERENCES users(id)
+        ON DELETE CASCADE,
+
+    message TEXT NOT NULL,
+    /* tracks whether the notification has been read */
+    is_read BOOLEAN DEFAULT FALSE,
+    /* When the notification was created*/
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
