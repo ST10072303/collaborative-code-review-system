@@ -11,6 +11,19 @@ import { Request, Response, NextFunction } from "express";
     next();
 };
 
+// validate a route parameter as a positive number.
+export const validateParamId = (parameterName: string) => {
+    return (req: Request, res: Response, next: NextFunction): void => {
+        const id = Number(req.params[parameterName]);
+
+        if (!Number.isInteger(id) || id <= 0) {
+            res.status(400).json({message: `${parameterName} must be a positive integer.`});
+            return;
+        }
+        next();
+    };
+};
+
 // validate that a value is a non-empty string.
 export const validateRequiredText = (value: unknown, fieldName: string, res: Response): boolean => {
     if (typeof value !== "string" || value.trim() === "") {

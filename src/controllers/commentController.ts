@@ -28,10 +28,10 @@ export const createComment = async (req: Request, res: Response): Promise<void> 
         }
 
         // validate comment content.
-        if (!content) {
+       if (!content || typeof content !== "string" || content.trim() === "") {
             res.status(400).json({message: "Comment content is required."});
             return;
-        }
+}
 
         // validate line_number supplied.
         if (line_number !== undefined && (!Number.isInteger(Number(line_number)) ||Number(line_number) <= 0)) {
